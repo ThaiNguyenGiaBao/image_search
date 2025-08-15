@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "similarity image search"
+version = "0.1.0"
+description = "A project for similarity image search using embedding vectors"
+authors = ["FireGroup"]
+
+[tool.poetry.dependencies]
+python = "^3.13"
+accelerate = "1.9.0"
+flower = "2.0.1"
+open_clip_torch = "3.1.0"
+pymongo = "4.14.0"
+qdrant-client = "1.15.1"
+transformers = "4.55.0"
+celery = "^5.4.0"
