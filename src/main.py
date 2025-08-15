@@ -8,7 +8,7 @@ import os
 
 
 qdrantClient = Qdrant(
-    collection_name="productsV3",
+    collection_name="products_on_disk",
     dim=768,
 ) 
 qdrantClient.ensure_collection() 

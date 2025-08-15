@@ -21,6 +21,8 @@ class Qdrant:
             timeout=120)
         self.collection_name = collection_name
         self.dim = dim
+        
+        print(f"Connecting to Qdrant at {os.getenv("QDRANT_URI", "https://localhost:6333")} with collection {self.collection_name}")
 
     def ensure_collection(self):
         cols = self.client.get_collections().collections
