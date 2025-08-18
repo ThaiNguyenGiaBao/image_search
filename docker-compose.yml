@@ -56,9 +56,20 @@ services:
     networks:
       - image_vector_network
 
+  qdrant:
+    image: qdrant
+    container_name: qdrant_container
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - image_vector_network  
+
 networks:
   image_vector_network:
     driver: bridge
 
 volumes:
   redis_data:
+  
