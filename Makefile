@@ -23,3 +23,13 @@ encoder_api:
 	source .venv/bin/activate && \
 	cd src && \
 	uvicorn embedding.api:app
+
+qdrant_performance:
+	source .venv/bin/activate && \
+	cd src && \
+	PYTHONPATH=. python performence/performence_qdrant.py
+
+model_performance:
+	source .venv/bin/activate && \
+	cd src && \
+	PYTHONPATH=. python performence/performence_model.py
