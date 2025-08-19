@@ -120,7 +120,7 @@ Latency (20 queries):
   Max    : 2.2958 s
 ```
 
-### C — Vectors + HNSW index **in RAM**
+### C — Quantiztion vectors + HNSW index **in RAM**
 ```
 MEM USAGE: 4.131GiB
 Latency (20 queries):
@@ -143,14 +143,10 @@ Latency (20 queries):
   - **All in RAM**: best latency (~0.018–0.02s measured), but requires multiple GBs of memory (~4 GiB observed for 1.5–5M).
   - **Hybrid (index in RAM, vectors on disk)**: provides a meaningful latency reduction over fully on-disk but does not reach in-RAM performance.
   - **All on disk**: lowest memory usage (~100s MiB) but highest latency (0.2–2+ s depending on scale).
-- **Memory curve**
-  - Memory requirements scale with both dataset size and HNSW connectivity (`m`). Expect multi-GB budgets for low-latency production at 5M+ vectors.
-- **Tuning levers**
-  - `m`, `ef_construct`, `ef` (query-time) control recall vs memory and latency.
+
+- **Quantization**
   - Quantization reduces RAM and I/O but must be warmed/validated (quality vs speed trade-off).
-- **Operational**
-  - Building indexes on larger build hosts and transferring storage to production is often faster and safer than building in-place on constrained hosts.
-  - Monitor I/O and memory during builds; use snapshots to enable safe rollback.
+
 
 ---
 
@@ -166,17 +162,12 @@ Latency (20 queries):
 - Preserves full-precision vectors on disk for occasional rescoring or reindex operations.
 
 
-**Import / index-build best practice**
-- Import in batches, keep `m` low during ingestion, then rebuild index with target `m`/`ef_construct`.
-- Consider building on a high-memory node and moving the index files to production.
-
 ---
 
 ## Conclusion
 
 - For Zopi’s expected scale (~5M product variants), a **hybrid approach** (vectors on disk + HNSW + quantized vectors in RAM) offers a practical balance between memory cost (~4–5 GiB) and fast search (~tens of ms).  
 - Because encoding dominates total latency in CPU-only setups, **invest first in encoder optimization** (GPU inference, batching, caching). Use index placement and HNSW tuning to meet the remaining SLA trade-offs.  
-- Operationally, build large indexes on beefy hosts, transfer artifacts to production, and automate monitoring of memory, I/O, and latency.
 
 ---
 
