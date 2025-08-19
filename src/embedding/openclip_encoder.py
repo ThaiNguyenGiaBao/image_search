@@ -9,10 +9,10 @@ class OpenClipEncoder:
     def __init__(self,model_name='hf-hub:Marqo/marqo-ecommerce-embeddings-B', device=None):
         self.model_name = model_name
         device = device or (
-            #"cuda" if torch.cuda.is_available()
+            "cuda" if torch.cuda.is_available()
             #else "mps" if getattr(torch.backends, "mps", None) and torch.backends.mps.is_available()
-            #else "cpu"
-            "cpu"  
+            else "cpu"
+            #"cpu"  
         )
         print(f"Using device: {device}")
         self.device = torch.device(device)

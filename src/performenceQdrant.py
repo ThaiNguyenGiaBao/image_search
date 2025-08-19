@@ -1,20 +1,21 @@
-from src.vectorstore.qdrant import Qdrant
-from src.db.mongo import Mongo
+from vectorstore.qdrant import Qdrant
+from db.mongo import Mongo
 import numpy as np
 import hashlib
 from qdrant_client.models import PointStruct, ScoredPoint
+import time
+import os 
+import statistics
+import random
+
+
 
 qdrantClient = Qdrant(
-    url="",
-    api_key = "",
-    collection_name="test_products"
-)
-
-
-mongo = Mongo("",
-                "DropshipProducts",
-                "amazon_products")
-
+    collection_name=os.getenv("QDRANT_COLLECTION", "Benchmark"),
+    dim=768,
+) 
+qdrantClient.ensure_collection() 
+mongo = Mongo( "DropshipProducts", "amazon_products")
 
 
 DIM = 768
@@ -69,41 +70,53 @@ def noise_for_target_cosine(target_cos: float) -> float:
 def to_list(vec: np.ndarray) -> list[float]:
     return vec.astype(np.float32).tolist()
 
-id = 1
-points = []
-TOTAL_BATCH = 1000
-current_batch = 0
-for i in range(TOTAL_BATCH):
-    current_batch += 1
-    print(f"Processing batch {current_batch}...")
-    products = mongo.find(limit=600, skip=i*600)
-    for product in products:
-        # generate embeddings for the main product image
+
+def benchmark(num=100):
+    skip = random.randint(0, 2000)  
+    print(f"Benchmarking {num} queries, starting from skip={skip}...")
+    products = mongo.find(limit=1000, skip=skip)
+    results = []
+
+    for i in range(num):
+        idx = random.randint(0, len(products)-1)
+        product = products[idx]
         p_vec = embed_product(product["source_product_id"])
-        for variant in product['variants']:
-            payload = {
-                "source_product_id": product['source_product_id'],
-                "source_variant_id": variant['sku_id'],
-                "image": variant['image'],
-                "source": "amazon",
-                "options": product['options'],
-            }
-            
-            # generate embedding for variant by adding noise to product image vector
-            v_vec = embed_variant(p_vec, variant["sku_id"], noise_scale=0.15)
-            points.append(
-                PointStruct(
-                    id=id,
-                    vector=to_list(v_vec),
-                    payload=payload
-                )
-            )
-            id += 1
-            
-            if id % 200 == 0:
-                print(f"Upserting {id} points...")
-                qdrantClient.upsert_points(points)
-                points = []
+
+        start_time = time.time()
+        qdrantClient.query_points(
+            query_vector=to_list(p_vec),
+            limit=20
+        )
+        elapsed_time = time.time() - start_time
+        results.append(elapsed_time)
+        print(f"Query time for product {idx}: {elapsed_time:.4f} seconds")
+
+    # stats
+    avg_time = sum(results) / len(results)
+    std_dev = statistics.stdev(results) if len(results) > 1 else 0.0
+    min_time = min(results)
+    max_time = max(results)
+    median_time = statistics.median(results)
+
+    print("\n--- Benchmark Results ---")
+    print(f"Queries: {num}")
+    print(f"Average: {avg_time:.4f} s")
+    print(f"Std Dev: {std_dev:.4f} s")
+    print(f"Median : {median_time:.4f} s")
+    print(f"Min    : {min_time:.4f} s")
+    print(f"Max    : {max_time:.4f} s")
+
+    return {
+        "average": avg_time,
+        "std_dev": std_dev,
+        "median": median_time,
+        "min": min_time,
+        "max": max_time,
+    }
+
+benchmark(100)
+
+
         
    
         

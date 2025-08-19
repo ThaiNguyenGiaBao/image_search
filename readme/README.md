@@ -71,6 +71,9 @@ make flower
 
 # Start producer to begin processing
 make producer
+
+# Start a server at port 8888
+make encoder-api
 ```
 
 #### Manual Commands
