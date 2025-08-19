@@ -56,26 +56,26 @@ services:
     networks:
       - image_vector_network
 
-  qdrant5M:
-    image: qdrant/qdrant:latest
-    container_name: qdrant_5M_container
-    ports:
-      - "6335:6333"
-    volumes:
+  # qdrant5M:
+  #   image: qdrant/qdrant:latest
+  #   container_name: qdrant_5M_container
+  #   ports:
+  #     - "6335:6333"
+  #   volumes:
     
-      - ./qdrant_storage:/qdrant/storage
-    networks:
-      - image_vector_network  
+  #     - ./qdrant_storage:/qdrant/storage
+  #   networks:
+  #     - image_vector_network  
 
-  qdrant1_5M:
-    image: qdrant/qdrant:latest
-    container_name: qdrant_1_5M_container
-    ports:
-      - "6331:6333"
-    volumes:
-      - ./qdrant_1_5M_storage:/qdrant/storage
-    networks:
-      - image_vector_network
+  # qdrant1_5M:
+  #   image: qdrant/qdrant:latest
+  #   container_name: qdrant_1_5M_container
+  #   ports:
+  #     - "6331:6333"
+  #   volumes:
+  #     - ./qdrant_1_5M_storage:/qdrant/storage
+  #   networks:
+  #     - image_vector_network
   
 
 networks:
