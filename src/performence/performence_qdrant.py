@@ -114,7 +114,7 @@ def benchmark(num=100):
         "max": max_time,
     }
 
-benchmark(100)
+benchmark(20)
 
 
         
